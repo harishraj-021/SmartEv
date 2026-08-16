@@ -1,0 +1,12 @@
+import { useEffect, useState } from 'react'
+import { Search, CarFront } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Input } from '@/components/ui/Input'
+import { Badge } from '@/components/ui/Badge'
+import { api, type Vehicle } from '@/lib/api'
+
+export default function Vehicles() {
+  const [q, setQ] = useState(''); const [items, setItems] = useState<Vehicle[]>([])
+  useEffect(() => { const t = setTimeout(() => api.vehicles(q).then(x => setItems(x.items)).catch(() => undefined), 180); return () => clearTimeout(t) }, [q])
+  return <div className="space-y-6"><div><Badge tone="blue">DATASET</Badge><h1 className="mt-3 text-3xl font-semibold tracking-tight">Vehicle catalogue</h1><p className="mt-2 text-sm text-white/40">Only records from your supplied EV Energy Efficiency Dataset are shown.</p></div><Card><CardHeader><div className="flex flex-col justify-between gap-3 md:flex-row md:items-center"><CardTitle>{items.length} records</CardTitle><div className="relative w-full md:w-80"><Search size={15} className="absolute left-3 top-3.5 text-white/25"/><Input value={q} onChange={e => setQ(e.target.value)} placeholder="Search make, model, class…" className="pl-9"/></div></div></CardHeader><CardContent><div className="overflow-x-auto pt-4"><table className="w-full min-w-[760px] text-left text-sm"><thead><tr className="border-b border-white/7 text-[10px] uppercase tracking-wider text-white/25"><th className="pb-3">Vehicle</th><th className="pb-3">Class</th><th className="pb-3">Year</th><th className="pb-3">Motor</th><th className="pb-3">Recharge</th><th className="pb-3">Efficiency</th></tr></thead><tbody>{items.map((v,i) => <tr key={`${v.Make}-${v.Model}-${v['Model year']}-${i}`} className="border-b border-white/5 last:border-0"><td className="py-4"><div className="flex items-center gap-3"><div className="grid h-9 w-9 place-items-center rounded-xl bg-white/[.04] text-white/45"><CarFront size={16}/></div><div><p className="font-medium">{v.Make} {v.Model}</p><p className="text-[10px] text-white/30">Dataset record</p></div></div></td><td><Badge>{v['Vehicle class']}</Badge></td><td className="text-white/60">{v['Model year']}</td><td className="text-white/60">{v['Motor (kW)']} kW</td><td className="text-white/60">{v['Recharge time (h)']} h</td><td className="font-semibold text-white">{v['Energy Efficiency (km/kWh)'].toFixed(2)} <span className="font-normal text-white/30">km/kWh</span></td></tr>)}</tbody></table></div></CardContent></Card></div>
+}
