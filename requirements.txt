@@ -1,8 +1,0 @@
-streamlit
-scikit-learn
-numpy
-pandas
-requests
-folium
-streamlit-folium
-polyline
